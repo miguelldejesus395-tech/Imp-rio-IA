@@ -6,59 +6,146 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#090914">
   <title>👑 Império AI</title>
+
   <style>
-    * { box-sizing: border-box; }
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      margin: 0; min-height: 100vh; background: #090914;
-      color: #f5f3ff; font: 16px Arial, sans-serif;
-      display: flex; justify-content: center; padding: 20px;
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(ellipse at top, #211746 0%, #090914 65%);
+      color: #f5f3ff;
+      font: 16px Arial, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 20px;
     }
+
     main {
-      width: 100%; max-width: 760px; display: flex;
-      flex-direction: column; gap: 18px;
+      width: 100%;
+      max-width: 760px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
     }
-    header { text-align: center; padding: 20px 0; }
-    h1 { font-size: 32px; margin: 0 0 10px; }
-    header p, .notice { color: #c4b5fd; line-height: 1.6; }
+
+    header {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    h1 {
+      font-size: 32px;
+      margin: 0 0 10px;
+    }
+
+    header p,
     .notice {
-      background: #19152b; border: 1px solid #514078;
-      border-radius: 18px; padding: 18px;
+      color: #c4b5fd;
+      line-height: 1.6;
     }
+
+    .notice {
+      background: #19152b;
+      border: 1px solid #514078;
+      border-radius: 18px;
+      padding: 18px;
+    }
+
     #chat {
-      min-height: 300px; max-height: 55vh; overflow-y: auto;
-      display: flex; flex-direction: column; gap: 14px;
-      padding: 18px; border: 1px solid #34334d;
-      border-radius: 22px; background: #111322;
+      min-height: 300px;
+      max-height: 55vh;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 18px;
+      border: 1px solid #34334d;
+      border-radius: 22px;
+      background: #111322;
     }
+
     .message {
-      white-space: pre-wrap; overflow-wrap: anywhere;
-      line-height: 1.6; padding: 14px 16px;
-      border-radius: 18px; max-width: 90%;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      line-height: 1.6;
+      padding: 14px 16px;
+      border-radius: 18px;
+      max-width: 90%;
     }
-    .bot { align-self: flex-start; background: #1c2135; }
-    .user { align-self: flex-end; background: #51318e; }
-    form { display: flex; gap: 10px; }
+
+    .bot {
+      align-self: flex-start;
+      background: #1c2135;
+    }
+
+    .user {
+      align-self: flex-end;
+      background: #51318e;
+    }
+
+    form {
+      display: flex;
+      gap: 10px;
+    }
+
     textarea {
-      flex: 1; min-width: 0; resize: vertical;
-      min-height: 60px; padding: 16px; border-radius: 16px;
-      border: 1px solid #45435f; background: #0b0d18;
-      color: white; font: inherit;
+      flex: 1;
+      min-width: 0;
+      resize: vertical;
+      min-height: 60px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid #45435f;
+      background: #0b0d18;
+      color: white;
+      font: inherit;
     }
+
     button {
-      border: 0; border-radius: 16px; padding: 16px;
-      background: linear-gradient(120deg,#9658ff,#347cff);
-      color: white; font-weight: bold; font-size: 16px;
+      border: 0;
+      border-radius: 16px;
+      padding: 16px;
+      background: linear-gradient(120deg, #9658ff, #347cff);
+      color: white;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
     }
-    button:disabled { opacity: .5; }
-    #status { color: #bcb8d4; font-size: 14px; }
-    @media(max-width:480px) {
-      body { padding: 12px; }
-      h1 { font-size: 27px; }
-      form { flex-direction: column; }
-      button { min-height: 52px; }
+
+    button:disabled {
+      opacity: .5;
+      cursor: wait;
+    }
+
+    #status {
+      color: #bcb8d4;
+      font-size: 14px;
+    }
+
+    @media (max-width: 480px) {
+      body {
+        padding: 12px;
+      }
+
+      h1 {
+        font-size: 27px;
+      }
+
+      form {
+        flex-direction: column;
+      }
+
+      button {
+        min-height: 52px;
+      }
     }
   </style>
 </head>
+
 <body>
 <main>
   <header>
@@ -73,77 +160,122 @@
 
   <section id="chat" aria-live="polite">
     <div class="message bot">
-      Olá! Sou o Império AI. Envie uma mensagem para começar.
+      Olá! Sou o Império AI. Envie sua mensagem para começar.
     </div>
   </section>
 
-  <div id="status"></div>
+  <div id="status" role="status"></div>
 
   <form id="form">
-    <textarea id="input" placeholder="Escreva sua mensagem..."
-      aria-label="Sua mensagem" required></textarea>
+    <textarea
+      id="input"
+      placeholder="Escreva sua mensagem..."
+      aria-label="Sua mensagem"
+      required
+    ></textarea>
     <button id="send" type="submit">Enviar</button>
   </form>
 </main>
 
 <script>
-  const API_URL = "https://imperio-ai-api.onrender.com/api/chat";
+  const API_URL =
+    "https://imperio-ai-api.onrender.com/api/chat";
+
   const chat = document.getElementById("chat");
   const form = document.getElementById("form");
   const input = document.getElementById("input");
   const send = document.getElementById("send");
   const status = document.getElementById("status");
 
+  // O servidor espera role e content.
   const history = [];
 
   function addMessage(text, role) {
     const item = document.createElement("div");
-    item.className = "message " + (role === "user" ? "user" : "bot");
+
+    item.className =
+      "message " + (role === "user" ? "user" : "bot");
+
     item.textContent = text;
     chat.appendChild(item);
     chat.scrollTop = chat.scrollHeight;
+
     return item;
   }
 
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
+
     const text = input.value.trim();
-    if (!text || send.disabled) return;
+
+    if (!text || send.disabled) {
+      return;
+    }
 
     addMessage(text, "user");
-    history.push({ papel: "usuário", conteudo: text });
+
+    // Formato correto para o server.js.
+    history.push({
+      role: "user",
+      content: text
+    });
+
     input.value = "";
     send.disabled = true;
     status.textContent = "O Império AI está pensando...";
+
     const waiting = addMessage("Aguarde...", "bot");
 
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: history })
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          messages: history
+        })
       });
 
       const data = await response.json();
+
       if (!response.ok) {
-        throw new Error(data.error || "Erro HTTP " + response.status);
+        throw new Error(
+          data.error || "Erro HTTP " + response.status
+        );
       }
 
-      const answer = data.reply || data.response ||
-        data.message || data.choices?.[0]?.message?.content;
+      const answer = data.reply;
 
-      if (typeof answer !== "string" || !answer.trim()) {
-        throw new Error("O servidor não retornou uma resposta reconhecida.");
+      if (
+        typeof answer !== "string" ||
+        !answer.trim()
+      ) {
+        throw new Error(
+          "O servidor não retornou uma resposta válida."
+        );
       }
 
       waiting.textContent = answer;
-      history.push({ papel: "assistente", conteudo: answer });
+
+      // Guarda a resposta no formato esperado pelo servidor.
+      history.push({
+        role: "assistant",
+        content: answer
+      });
+
       status.textContent = "Resposta recebida.";
+
     } catch (error) {
-      waiting.textContent = "Não consegui obter resposta da IA. " +
-        "Confira os Logs do Render. Detalhe: " + error.message;
+      waiting.textContent =
+        "Não consegui obter resposta da IA. Detalhe: " +
+        error.message;
+
       status.textContent = "Falha na conexão.";
+
+      // Remove a mensagem do usuário que falhou.
       history.pop();
+
     } finally {
       send.disabled = false;
       input.focus();
