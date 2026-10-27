@@ -111,7 +111,7 @@
     if (!text || send.disabled) return;
 
     addMessage(text, "user");
-    history.push({ role: "user", content: text });
+    history.push({ papel: "usuário", conteudo: text });
     input.value = "";
     send.disabled = true;
     status.textContent = "O Império AI está pensando...";
@@ -137,7 +137,7 @@
       }
 
       waiting.textContent = answer;
-      history.push({ role: "assistant", content: answer });
+      history.push({ papel: "assistente", conteudo: answer });
       status.textContent = "Resposta recebida.";
     } catch (error) {
       waiting.textContent = "Não consegui obter resposta da IA. " +
