@@ -1,9 +1,26 @@
-
 const express = require("express");
+const { createClient } = require("@supabase/supabase-js");
 
 const app = express();
+const PORT = process.env.PORT || 3000;
 
-// Permite que o site no GitHub Pages acesse a API no Render
+const API_KEY = process.env.OPENROUTER_API_KEY;
+const MODEL = process.env.OPENROUTER_MODEL || "openrouter/auto";
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+const supabase =
+  SUPABASE_URL && SUPABASE_SERVICE_ROLE_KEY
+    ? createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+        auth: {
+          autoRefreshToken: false,
+          persistSession: false
+        }
+      })
+    : null;
+
 app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Origin",
@@ -15,7 +32,7 @@ app.use((req, res, next) => {
   );
   res.setHeader(
     "Access-Control-Allow-Headers",
-    "Content-Type"
+    "Content-Type, Authorization"
   );
 
   if (req.method === "OPTIONS") {
@@ -27,10 +44,6 @@ app.use((req, res, next) => {
 
 app.use(express.json({ limit: "20kb" }));
 
-const PORT = process.env.PORT || 3000;
-const API_KEY = process.env.OPENROUTER_API_KEY;
-const MODEL = process.env.OPENROUTER_MODEL || "openrouter/auto";
-
 app.get("/", (_req, res) => {
   res.json({
     status: "online",
@@ -39,7 +52,10 @@ app.get("/", (_req, res) => {
 });
 
 app.get("/health", (_req, res) => {
-  res.json({ status: "ok" });
+  res.json({
+    status: "ok",
+    supabaseConfigured: Boolean(supabase)
+  });
 });
 
 app.post("/api/chat", async (req, res) => {
@@ -127,10 +143,7 @@ app.post("/api/chat", async (req, res) => {
 
     return res.json({ reply });
   } catch (error) {
-    console.error(
-      "Falha na solicitação de chat:",
-      error.message
-    );
+    console.error("Falha na solicitação de chat:", error.message);
 
     return res.status(500).json({
       error: "Erro interno ao processar a mensagem."
