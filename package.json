@@ -1,1 +1,15 @@
 
+
+{
+  "name": "imperio-ai-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Servidor seguro para conectar o Império AI ao OpenRouter",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}
