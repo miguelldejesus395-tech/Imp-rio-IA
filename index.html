@@ -1,287 +1,917 @@
-
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#090914">
-  <title>👑 Império AI</title>
+  <meta name="theme-color" content="#0b0914">
+  <title>👑 Império AI 18+</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
-    * {
-      box-sizing: border-box;
+    :root {
+      --bg: #0b0914;
+      --panel: #151124;
+      --panel2: #1d1730;
+      --line: #332747;
+      --text: #f8f5ff;
+      --muted: #aaa0c0;
+      --purple: #9a5bff;
+      --blue: #397dff;
+      --pink: #ff4fa3;
+      --green: #42d6a0;
+      --danger: #ff6b81;
     }
+
+    * { box-sizing: border-box; }
 
     body {
       margin: 0;
       min-height: 100vh;
+      color: var(--text);
       background:
-        radial-gradient(ellipse at top, #211746 0%, #090914 65%);
-      color: #f5f3ff;
-      font: 16px Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      padding: 20px;
+        radial-gradient(ellipse at 15% 0%, #29174c 0%, transparent 40%),
+        radial-gradient(ellipse at 100% 40%, #101d43 0%, transparent 35%),
+        var(--bg);
+      font: 15px Arial, sans-serif;
     }
 
-    main {
-      width: 100%;
-      max-width: 760px;
-      display: flex;
-      flex-direction: column;
-      gap: 18px;
+    button, input, textarea, select { font: inherit; }
+    button { cursor: pointer; }
+
+    .app {
+      width: min(1200px, 100%);
+      margin: auto;
+      padding: 18px;
     }
 
-    header {
-      text-align: center;
-      padding: 20px 0;
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      padding: 14px 0 22px;
+    }
+
+    .brand {
+      font-size: 23px;
+      font-weight: 900;
+      letter-spacing: -.5px;
+    }
+
+    .brand span { color: #bc8cff; }
+
+    .top-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      border: 1px solid var(--line);
+      background: var(--panel2);
+      color: var(--text);
+      border-radius: 12px;
+      padding: 11px 15px;
+      font-weight: 700;
+    }
+
+    .btn.primary {
+      border: 0;
+      background: linear-gradient(115deg, var(--purple), var(--blue));
+    }
+
+    .btn:disabled { opacity: .55; cursor: wait; }
+
+    .hero {
+      border: 1px solid #473365;
+      border-radius: 24px;
+      padding: clamp(22px, 5vw, 44px);
+      background:
+        radial-gradient(ellipse at 80% 20%, #5a2d9140, transparent 45%),
+        linear-gradient(135deg, #201735, #111425);
+      margin-bottom: 20px;
+    }
+
+    .eyebrow {
+      color: #c9a6ff;
+      font-weight: 800;
+      text-transform: uppercase;
+      font-size: 12px;
+      letter-spacing: 2px;
     }
 
     h1 {
-      font-size: 32px;
-      margin: 0 0 10px;
+      font-size: clamp(30px, 6vw, 48px);
+      margin: 12px 0;
+      line-height: 1.08;
     }
 
-    header p,
+    .hero p, .muted { color: var(--muted); line-height: 1.6; }
+
+    .age {
+      display: inline-block;
+      color: #ffc2dc;
+      border: 1px solid #91416d;
+      background: #45172f;
+      border-radius: 9px;
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 4px 0 18px;
+      margin-bottom: 4px;
+    }
+
+    .nav button {
+      white-space: nowrap;
+      border: 1px solid var(--line);
+      color: var(--muted);
+      background: #151124;
+      border-radius: 12px;
+      padding: 12px 15px;
+    }
+
+    .nav button.active {
+      color: white;
+      background: #39245c;
+      border-color: #8c5ed0;
+    }
+
+    .panel {
+      background: #141121eF;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      margin-bottom: 18px;
+      min-width: 0;
+    }
+
+    h2 { font-size: 22px; margin: 0 0 14px; }
+    h3 { font-size: 17px; margin: 0 0 8px; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      background: linear-gradient(145deg, #211a34, #131321);
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .cover {
+      min-height: 155px;
+      aspect-ratio: 16 / 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #39235d, #172d51);
+      color: #d8c6ff;
+      font-size: 42px;
+      overflow: hidden;
+    }
+
+    .cover img, .cover video {
+      width: 100%;
+      height: 100%;
+      min-height: 155px;
+      object-fit: cover;
+    }
+
+    .card-body { padding: 15px; }
+    .price { color: #d0a6ff; font-weight: 800; margin: 12px 0; }
+    .field { display: grid; gap: 7px; margin-bottom: 13px; }
+    .field label { color: #d6cce9; font-size: 13px; }
+
+    input, textarea, select {
+      width: 100%;
+      border: 1px solid #493b60;
+      background: #0e0c18;
+      color: white;
+      border-radius: 11px;
+      padding: 13px;
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--purple);
+    }
+
+    textarea { min-height: 95px; resize: vertical; }
+    .hidden { display: none !important; }
+
     .notice {
-      color: #c4b5fd;
-      line-height: 1.6;
+      padding: 13px 15px;
+      border-radius: 12px;
+      background: #211a35;
+      border: 1px solid #483565;
+      color: #d5c7ef;
+      line-height: 1.55;
+      margin: 12px 0;
     }
 
-    .notice {
-      background: #19152b;
-      border: 1px solid #514078;
-      border-radius: 18px;
-      padding: 18px;
+    .notice.error {
+      background: #361725;
+      border-color: #79334b;
+      color: #ffc4d0;
     }
 
-    #chat {
-      min-height: 300px;
-      max-height: 55vh;
-      overflow-y: auto;
+    .notice.success {
+      background: #102d28;
+      border-color: #246e5b;
+      color: #b9ffe8;
+    }
+
+    .status {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 10px;
+    }
+
+    .chat {
       display: flex;
       flex-direction: column;
-      gap: 14px;
-      padding: 18px;
-      border: 1px solid #34334d;
-      border-radius: 22px;
-      background: #111322;
+      gap: 12px;
+      max-height: 430px;
+      overflow-y: auto;
+      background: #0e0d19;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      padding: 14px;
+      margin: 12px 0;
     }
 
     .message {
       white-space: pre-wrap;
       overflow-wrap: anywhere;
       line-height: 1.6;
-      padding: 14px 16px;
-      border-radius: 18px;
-      max-width: 90%;
+      padding: 12px 14px;
+      border-radius: 14px;
+      max-width: 92%;
     }
 
-    .bot {
-      align-self: flex-start;
-      background: #1c2135;
+    .message.bot { align-self: flex-start; background: #211d32; }
+    .message.user { align-self: flex-end; background: #4b2b80; }
+
+    .chat-form { display: flex; gap: 9px; }
+    .chat-form textarea { min-height: 54px; }
+
+    .balance {
+      font-size: 28px;
+      font-weight: 900;
+      color: var(--green);
+      margin: 10px 0;
     }
 
-    .user {
-      align-self: flex-end;
-      background: #51318e;
+    footer {
+      text-align: center;
+      color: #8f86a7;
+      font-size: 12px;
+      padding: 25px 5px;
+      line-height: 1.6;
     }
 
-    form {
-      display: flex;
-      gap: 10px;
-    }
-
-    textarea {
-      flex: 1;
-      min-width: 0;
-      resize: vertical;
-      min-height: 60px;
-      padding: 16px;
-      border-radius: 16px;
-      border: 1px solid #45435f;
-      background: #0b0d18;
-      color: white;
-      font: inherit;
-    }
-
-    button {
-      border: 0;
-      border-radius: 16px;
-      padding: 16px;
-      background: linear-gradient(120deg, #9658ff, #347cff);
-      color: white;
-      font-weight: bold;
-      font-size: 16px;
-      cursor: pointer;
-    }
-
-    button:disabled {
-      opacity: .5;
-      cursor: wait;
-    }
-
-    #status {
-      color: #bcb8d4;
-      font-size: 14px;
-    }
-
-    @media (max-width: 480px) {
-      body {
-        padding: 12px;
-      }
-
-      h1 {
-        font-size: 27px;
-      }
-
-      form {
-        flex-direction: column;
-      }
-
-      button {
-        min-height: 52px;
-      }
+    @media (max-width: 600px) {
+      .app { padding: 12px; }
+      .topbar { align-items: flex-start; }
+      .brand { font-size: 20px; }
+      .hero { border-radius: 18px; }
+      .panel { padding: 15px; }
+      .chat-form { flex-direction: column; }
+      .chat-form .btn { min-height: 48px; }
     }
   </style>
 </head>
 
 <body>
-<main>
-  <header>
-    <h1>👑 Império AI</h1>
-    <p>Sua inteligência artificial, em um só lugar.</p>
+<div class="app">
+  <header class="topbar">
+    <div class="brand">👑 IMPÉRIO <span>AI 18+</span></div>
+    <div class="top-actions">
+      <button class="btn" id="accountButton">Entrar / Cadastrar</button>
+      <button class="btn hidden" id="logoutButton">Sair</button>
+    </div>
   </header>
 
-  <div class="notice">
-    Bem-vindo à Império AI! Envie sua mensagem para conversar
-    com o assistente. Não envie senhas ou dados confidenciais.
-  </div>
+  <section class="hero">
+    <span class="eyebrow">Criadores • Comunidade • Inteligência artificial</span>
+    <h1>Seu espaço criativo.<br>Seu Império.</h1>
+    <p>Explore o catálogo, descubra criadores e converse com a inteligência artificial.</p>
+    <span class="age">18+ • Somente adultos</span>
+  </section>
 
-  <section id="chat" aria-live="polite">
-    <div class="message bot">
-      Olá! Sou o Império AI. Envie sua mensagem para começar.
+  <nav class="nav" aria-label="Menu principal">
+    <button class="active" data-page="catalog">🛍️ Catálogo</button>
+    <button data-page="creator">🎨 Criador</button>
+    <button data-page="wallet">🪙 Carteira</button>
+    <button data-page="chatPage">🤖 Império AI</button>
+    <button data-page="account">👤 Minha conta</button>
+  </nav>
+
+  <div id="globalStatus" class="notice hidden" role="status"></div>
+
+  <section id="catalog" class="page">
+    <div class="panel">
+      <h2>🛍️ Catálogo</h2>
+      <p class="muted">Conteúdos publicados por criadores. Os itens disponíveis dependem dos registros e das permissões configuradas no Supabase.</p>
+      <button class="btn primary" id="refreshCatalog">Atualizar catálogo</button>
+    </div>
+    <div id="catalogGrid" class="grid">
+      <div class="panel">
+        <h3>Carregando catálogo...</h3>
+        <p class="muted">Aguarde enquanto verificamos os conteúdos publicados.</p>
+      </div>
     </div>
   </section>
 
-  <div id="status" role="status"></div>
+  <section id="creator" class="page hidden">
+    <div class="panel">
+      <h2>🎨 Área do criador</h2>
+      <p class="muted">Entre na sua conta para preparar um conteúdo. O envio só será concluído se as políticas de acesso do Supabase permitirem.</p>
+      <form id="uploadForm">
+        <div class="field">
+          <label for="mediaTitle">Título</label>
+          <input id="mediaTitle" maxlength="100" required placeholder="Nome do conteúdo">
+        </div>
+        <div class="field">
+          <label for="mediaDescription">Descrição</label>
+          <textarea id="mediaDescription" maxlength="1000" placeholder="Descreva seu conteúdo"></textarea>
+        </div>
+        <div class="field">
+          <label for="mediaType">Tipo de conteúdo</label>
+          <select id="mediaType" required>
+            <option value="image">Foto</option>
+            <option value="video">Vídeo</option>
+          </select>
+        </div>
+        <div class="field">
+          <label for="mediaPrice">Preço em moedas</label>
+          <input id="mediaPrice" type="number" min="0" max="1000000" value="0" required>
+        </div>
+        <div class="field">
+          <label for="mediaFile">Arquivo</label>
+          <input id="mediaFile" type="file" accept="image/*,video/*" required>
+        </div>
+        <div class="notice">Envie somente conteúdo que você tem direito de publicar. Todas as pessoas retratadas devem ser adultas e ter consentido com a publicação. Conteúdo ilegal ou íntimo sem consentimento não é permitido.</div>
+        <button class="btn primary" id="uploadButton" type="submit">Enviar conteúdo</button>
+      </form>
+      <div id="uploadStatus" class="status" role="status"></div>
+    </div>
+  </section>
 
-  <form id="form">
-    <textarea
-      id="input"
-      placeholder="Escreva sua mensagem..."
-      aria-label="Sua mensagem"
-      required
-    ></textarea>
-    <button id="send" type="submit">Enviar</button>
-  </form>
-</main>
+  <section id="wallet" class="page hidden">
+    <div class="panel">
+      <h2>🪙 Minha carteira</h2>
+      <p class="muted">Saldo de moedas vinculado à sua conta.</p>
+      <div class="balance" id="coinBalance">— moedas</div>
+      <div class="notice">A compra de moedas e os pagamentos por Pix ou cartão ainda precisam de uma integração de pagamento validada no servidor. Nenhuma cobrança será feita por esta tela.</div>
+      <button class="btn" id="refreshWallet">Atualizar saldo</button>
+      <div id="walletStatus" class="status" role="status"></div>
+    </div>
+  </section>
+
+  <section id="chatPage" class="page hidden">
+    <div class="panel">
+      <h2>🤖 Império AI</h2>
+      <p class="muted">Converse com o assistente. Não envie senhas ou dados confidenciais.</p>
+      <div id="chat" class="chat" aria-live="polite">
+        <div class="message bot">Olá! Sou o Império AI. Envie sua mensagem para começar.</div>
+      </div>
+      <div id="chatStatus" class="status" role="status"></div>
+      <form id="chatForm" class="chat-form">
+        <textarea id="chatInput" aria-label="Sua mensagem" placeholder="Escreva sua mensagem..." required></textarea>
+        <button class="btn primary" id="sendButton" type="submit">Enviar</button>
+      </form>
+    </div>
+  </section>
+
+  <section id="account" class="page hidden">
+    <div class="panel">
+      <h2>👤 Minha conta</h2>
+      <div id="sessionInfo" class="notice">Você ainda não entrou na sua conta.</div>
+      <button class="btn primary" id="openAuth">Entrar / Criar conta</button>
+    </div>
+  </section>
+
+  <section id="authPanel" class="panel hidden">
+    <h2>🔐 Acesso à conta</h2>
+    <p class="muted">Use seu e-mail para entrar ou criar uma conta. O Supabase pode exigir confirmação por e-mail.</p>
+    <form id="authForm">
+      <div class="field">
+        <label for="authEmail">E-mail</label>
+        <input id="authEmail" type="email" autocomplete="email" required placeholder="voce@email.com">
+      </div>
+      <div class="field">
+        <label for="authPassword">Senha</label>
+        <input id="authPassword" type="password" minlength="6" autocomplete="current-password" required placeholder="Mínimo de 6 caracteres">
+      </div>
+      <div class="top-actions">
+        <button class="btn primary" type="submit" id="loginButton">Entrar</button>
+        <button class="btn" type="button" id="signupButton">Criar conta</button>
+        <button class="btn" type="button" id="closeAuth">Fechar</button>
+      </div>
+    </form>
+    <div id="authStatus" class="status" role="status"></div>
+  </section>
+
+  <footer>
+    Império AI 18+ • Plataforma para adultos.<br>
+    O acesso à conta não garante autorização para publicar ou comprar conteúdos: as permissões do banco e do servidor continuam sendo aplicadas.
+  </footer>
+</div>
 
 <script>
-  const API_URL =
-    "https://imperio-ai-api.onrender.com/api/chat";
+(() => {
+  "use strict";
 
-  const chat = document.getElementById("chat");
-  const form = document.getElementById("form");
-  const input = document.getElementById("input");
-  const send = document.getElementById("send");
-  const status = document.getElementById("status");
+  // Configuração pública do projeto Supabase.
+  // A chave publishable pode ficar no navegador; nunca coloque service_role
+  // ou sb_secret neste arquivo.
+  const SUPABASE_URL = "https://jzcrdzdmsjqxwhbavreu.supabase.co";
+  const SUPABASE_PUBLISHABLE_KEY =
+    "sb_publishable_VhPq8VF0N6MVMV4y6-MP8Q_apWjRIGC";
 
-  // O servidor espera role e content.
-  const history = [];
+  const API_URL = "https://imperio-ai-api.onrender.com/api/chat";
+  const BUCKET = "imperio-media";
 
-  function addMessage(text, role) {
-    const item = document.createElement("div");
+  const $ = (id) => document.getElementById(id);
 
-    item.className =
-      "message " + (role === "user" ? "user" : "bot");
+  let supabase = null;
+  let currentUser = null;
+  let chatHistory = [];
+  let sendingChat = false;
 
-    item.textContent = text;
-    chat.appendChild(item);
-    chat.scrollTop = chat.scrollHeight;
-
-    return item;
+  function showStatus(id, message, kind = "") {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = message;
+    el.className = kind ? "notice " + kind : "notice";
+    el.classList.remove("hidden");
   }
 
-  form.addEventListener("submit", async (event) => {
-    event.preventDefault();
+  function clearStatus(id) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = "";
+    el.classList.add("hidden");
+  }
 
-    const text = input.value.trim();
+  function friendlyError(error) {
+    const msg = error?.message || "Ocorreu um erro inesperado.";
+    if (/row-level security|permission denied|not allowed/i.test(msg)) {
+      return "O Supabase bloqueou esta operação por segurança. É necessário conferir as políticas de acesso (RLS).";
+    }
+    if (/invalid login credentials/i.test(msg)) {
+      return "E-mail ou senha incorretos.";
+    }
+    if (/email not confirmed/i.test(msg)) {
+      return "Confirme seu e-mail antes de entrar.";
+    }
+    return msg;
+  }
 
-    if (!text || send.disabled) {
+  function switchPage(pageId) {
+    document.querySelectorAll(".page").forEach(page => {
+      page.classList.toggle("hidden", page.id !== pageId);
+    });
+
+    document.querySelectorAll(".nav button").forEach(button => {
+      button.classList.toggle("active", button.dataset.page === pageId);
+    });
+
+    if (pageId === "catalog") loadCatalog();
+    if (pageId === "wallet") loadWallet();
+    if (pageId === "account") updateAccount();
+  }
+
+  function openAuth() {
+    $("authPanel").classList.remove("hidden");
+    $("authPanel").scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  function updateAccount() {
+    const info = $("sessionInfo");
+
+    if (currentUser) {
+      info.textContent = "Conectado como " + currentUser.email;
+      $("accountButton").textContent = "Minha conta";
+      $("logoutButton").classList.remove("hidden");
+      $("openAuth").classList.add("hidden");
+    } else {
+      info.textContent = "Você ainda não entrou na sua conta.";
+      $("accountButton").textContent = "Entrar / Cadastrar";
+      $("logoutButton").classList.add("hidden");
+      $("openAuth").classList.remove("hidden");
+    }
+  }
+
+  async function loadCatalog() {
+    const grid = $("catalogGrid");
+    grid.replaceChildren();
+
+    if (!supabase) {
+      grid.textContent = "A conexão com o Supabase não está disponível.";
       return;
     }
 
-    addMessage(text, "user");
+    const loading = document.createElement("div");
+    loading.className = "panel";
+    loading.textContent = "Consultando conteúdos publicados...";
+    grid.appendChild(loading);
 
-    // Formato correto para o server.js.
-    history.push({
-      role: "user",
-      content: text
-    });
+    try {
+      const { data, error } = await supabase
+        .from("media")
+        .select("id, creator_id, title, description, media_type, storage_path, price_coins, published, created_at")
+        .eq("published", true)
+        .order("created_at", { ascending: false })
+        .limit(60);
 
-    input.value = "";
-    send.disabled = true;
-    status.textContent = "O Império AI está pensando...";
+      if (error) throw error;
 
-    const waiting = addMessage("Aguarde...", "bot");
+      grid.replaceChildren();
+
+      if (!data || data.length === 0) {
+        const empty = document.createElement("div");
+        empty.className = "panel";
+        empty.textContent = "Ainda não há conteúdos publicados ou sua conta não tem permissão para visualizá-los.";
+        grid.appendChild(empty);
+        return;
+      }
+
+      for (const item of data) {
+        const card = document.createElement("article");
+        card.className = "card";
+
+        const cover = document.createElement("div");
+        cover.className = "cover";
+        cover.textContent = item.media_type === "video" ? "▶" : "✦";
+
+        // O bucket é privado. Criamos uma URL temporária somente se
+        // as permissões do Storage autorizarem a leitura do arquivo.
+        if (item.storage_path) {
+          try {
+            const { data: signed, error: signedError } =
+              await supabase.storage.from(BUCKET)
+                .createSignedUrl(item.storage_path, 120);
+
+            if (!signedError && signed?.signedUrl) {
+              if (item.media_type === "video") {
+                const video = document.createElement("video");
+                video.src = signed.signedUrl;
+                video.controls = true;
+                video.preload = "metadata";
+                cover.replaceChildren(video);
+              } else {
+                const img = document.createElement("img");
+                img.src = signed.signedUrl;
+                img.alt = item.title || "Conteúdo do catálogo";
+                img.loading = "lazy";
+                cover.replaceChildren(img);
+              }
+            }
+          } catch (_) {
+            // Mantém a capa neutra se a leitura estiver bloqueada.
+          }
+        }
+
+        const body = document.createElement("div");
+        body.className = "card-body";
+
+        const title = document.createElement("h3");
+        title.textContent = item.title || "Conteúdo sem título";
+
+        const description = document.createElement("p");
+        description.className = "muted";
+        description.textContent = item.description || "Sem descrição.";
+
+        const price = document.createElement("div");
+        price.className = "price";
+        price.textContent = Number(item.price_coins || 0) + " moedas";
+
+        const action = document.createElement("button");
+        action.className = "btn";
+        action.textContent = "Detalhes";
+        action.addEventListener("click", () => {
+          alert("A compra ainda não está habilitada. Primeiro precisamos configurar a transação segura no servidor.");
+        });
+
+        body.append(title, description, price, action);
+        card.append(cover, body);
+        grid.appendChild(card);
+      }
+    } catch (error) {
+      grid.replaceChildren();
+      const errorBox = document.createElement("div");
+      errorBox.className = "panel";
+      errorBox.textContent =
+        "Não foi possível carregar o catálogo. " + friendlyError(error);
+      grid.appendChild(errorBox);
+    }
+  }
+
+  async function loadWallet() {
+    $("coinBalance").textContent = "— moedas";
+    $("walletStatus").textContent = "";
+
+    if (!supabase || !currentUser) {
+      $("walletStatus").textContent =
+        "Entre na sua conta para consultar a carteira.";
+      return;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from("wallets")
+        .select("coin_balance")
+        .eq("user_id", currentUser.id)
+        .maybeSingle();
+
+      if (error) throw error;
+
+      if (!data) {
+        $("walletStatus").textContent =
+          "Não foi encontrada uma carteira para esta conta. Ela precisa ser criada pelo fluxo seguro do servidor.";
+        return;
+      }
+
+      $("coinBalance").textContent =
+        Number(data.coin_balance || 0).toLocaleString("pt-BR") + " moedas";
+    } catch (error) {
+      $("walletStatus").textContent = friendlyError(error);
+    }
+  }
+
+  async function handleAuth(mode) {
+    if (!supabase) {
+      $("authStatus").textContent = "Supabase não foi inicializado.";
+      return;
+    }
+
+    const email = $("authEmail").value.trim();
+    const password = $("authPassword").value;
+
+    $("loginButton").disabled = true;
+    $("signupButton").disabled = true;
+    $("authStatus").textContent = "Processando...";
+
+    try {
+      if (mode === "signup") {
+        const { data, error } = await supabase.auth.signUp({
+          email,
+          password
+        });
+        if (error) throw error;
+
+        if (data.session) {
+          currentUser = data.user;
+          showStatus("globalStatus", "Conta criada e sessão iniciada.", "success");
+        } else {
+          $("authStatus").textContent =
+            "Cadastro recebido. Verifique seu e-mail para confirmar a conta e depois entre.";
+          return;
+        }
+      } else {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+        if (error) throw error;
+        currentUser = data.user;
+        showStatus("globalStatus", "Login realizado com sucesso.", "success");
+      }
+
+      $("authStatus").textContent = "";
+      $("authPanel").classList.add("hidden");
+      updateAccount();
+      await loadWallet();
+    } catch (error) {
+      $("authStatus").textContent = friendlyError(error);
+    } finally {
+      $("loginButton").disabled = false;
+      $("signupButton").disabled = false;
+    }
+  }
+
+  async function uploadContent(event) {
+    event.preventDefault();
+
+    if (!supabase || !currentUser) {
+      $("uploadStatus").textContent =
+        "Entre na sua conta antes de enviar conteúdo.";
+      openAuth();
+      return;
+    }
+
+    const file = $("mediaFile").files[0];
+    if (!file) {
+      $("uploadStatus").textContent = "Selecione um arquivo.";
+      return;
+    }
+
+    const type = $("mediaType").value;
+    if (type === "image" && !file.type.startsWith("image/")) {
+      $("uploadStatus").textContent = "Selecione um arquivo de imagem.";
+      return;
+    }
+    if (type === "video" && !file.type.startsWith("video/")) {
+      $("uploadStatus").textContent = "Selecione um arquivo de vídeo.";
+      return;
+    }
+
+    // Limite inicial de upload para evitar arquivos enormes no celular.
+    const maxBytes = type === "video" ? 100 * 1024 * 1024 : 15 * 1024 * 1024;
+    if (file.size > maxBytes) {
+      $("uploadStatus").textContent =
+        type === "video"
+          ? "O vídeo excede o limite inicial de 100 MB."
+          : "A imagem excede o limite inicial de 15 MB.";
+      return;
+    }
+
+    $("uploadButton").disabled = true;
+    $("uploadStatus").textContent = "Verificando permissões e enviando...";
+
+    // Caminho separado por usuário. A política do Storage ainda precisa
+    // garantir que cada usuário só envie/gerencie os próprios arquivos.
+    const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+    const path = currentUser.id + "/" + crypto.randomUUID() + "-" + safeName;
+
+    try {
+      const { error: storageError } = await supabase.storage
+        .from(BUCKET)
+        .upload(path, file, {
+          upsert: false,
+          contentType: file.type
+        });
+
+      if (storageError) throw storageError;
+
+      const { error: insertError } = await supabase
+        .from("media")
+        .insert({
+          creator_id: currentUser.id,
+          title: $("mediaTitle").value.trim(),
+          description: $("mediaDescription").value.trim(),
+          media_type: type,
+          storage_path: path,
+          price_coins: Number($("mediaPrice").value),
+          published: false
+        });
+
+      if (insertError) {
+        // Tenta remover o arquivo caso o registro do catálogo falhe.
+        await supabase.storage.from(BUCKET).remove([path]);
+        throw insertError;
+      }
+
+      $("uploadStatus").textContent =
+        "Conteúdo enviado como rascunho. Ele não aparece no catálogo até ser publicado por um fluxo autorizado.";
+      $("uploadForm").reset();
+    } catch (error) {
+      $("uploadStatus").textContent =
+        "O envio não foi concluído: " + friendlyError(error);
+    } finally {
+      $("uploadButton").disabled = false;
+    }
+  }
+
+  function addChatMessage(text, role) {
+    const item = document.createElement("div");
+    item.className = "message " + (role === "user" ? "user" : "bot");
+    item.textContent = text;
+    $("chat").appendChild(item);
+    $("chat").scrollTop = $("chat").scrollHeight;
+    return item;
+  }
+
+  async function sendChat(event) {
+    event.preventDefault();
+
+    const text = $("chatInput").value.trim();
+    if (!text || sendingChat) return;
+
+    sendingChat = true;
+    $("sendButton").disabled = true;
+
+    addChatMessage(text, "user");
+    chatHistory.push({ role: "user", content: text });
+    $("chatInput").value = "";
+    $("chatStatus").textContent = "O Império AI está pensando...";
+    const waiting = addChatMessage("Aguarde...", "bot");
 
     try {
       const response = await fetch(API_URL, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          messages: history
-        })
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: chatHistory })
       });
 
       const data = await response.json();
-
       if (!response.ok) {
-        throw new Error(
-          data.error || "Erro HTTP " + response.status
-        );
+        throw new Error(data.error || "Erro HTTP " + response.status);
       }
 
-      const answer = data.reply;
-
-      if (
-        typeof answer !== "string" ||
-        !answer.trim()
-      ) {
-        throw new Error(
-          "O servidor não retornou uma resposta válida."
-        );
+      if (typeof data.reply !== "string" || !data.reply.trim()) {
+        throw new Error("O servidor não retornou uma resposta válida.");
       }
 
-      waiting.textContent = answer;
-
-      // Guarda a resposta no formato esperado pelo servidor.
-      history.push({
-        role: "assistant",
-        content: answer
-      });
-
-      status.textContent = "Resposta recebida.";
-
+      waiting.textContent = data.reply;
+      chatHistory.push({ role: "assistant", content: data.reply });
+      $("chatStatus").textContent = "Resposta recebida.";
     } catch (error) {
       waiting.textContent =
-        "Não consegui obter resposta da IA. Detalhe: " +
-        error.message;
-
-      status.textContent = "Falha na conexão.";
-
-      // Remove a mensagem do usuário que falhou.
-      history.pop();
-
+        "Não consegui obter resposta da IA. Detalhe: " + error.message;
+      $("chatStatus").textContent = "Falha na conexão.";
+      chatHistory.pop();
     } finally {
-      send.disabled = false;
-      input.focus();
-      chat.scrollTop = chat.scrollHeight;
+      sendingChat = false;
+      $("sendButton").disabled = false;
+      $("chatInput").focus();
+      $("chat").scrollTop = $("chat").scrollHeight;
     }
+  }
+
+  document.querySelectorAll(".nav button").forEach(button => {
+    button.addEventListener("click", () => switchPage(button.dataset.page));
   });
+
+  $("accountButton").addEventListener("click", () => {
+    switchPage("account");
+    if (!currentUser) openAuth();
+  });
+
+  $("openAuth").addEventListener("click", openAuth);
+  $("closeAuth").addEventListener("click", () => $("authPanel").classList.add("hidden"));
+  $("loginButton").addEventListener("click", event => {
+    event.preventDefault();
+    handleAuth("login");
+  });
+  $("signupButton").addEventListener("click", () => handleAuth("signup"));
+
+  $("logoutButton").addEventListener("click", async () => {
+    if (!supabase) return;
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      showStatus("globalStatus", friendlyError(error), "error");
+      return;
+    }
+    currentUser = null;
+    updateAccount();
+    $("coinBalance").textContent = "— moedas";
+    showStatus("globalStatus", "Você saiu da conta.", "success");
+  });
+
+  $("refreshCatalog").addEventListener("click", loadCatalog);
+  $("refreshWallet").addEventListener("click", loadWallet);
+  $("uploadForm").addEventListener("submit", uploadContent);
+  $("chatForm").addEventListener("submit", sendChat);
+
+  async function init() {
+    updateAccount();
+
+    if (!window.supabase || !window.supabase.createClient) {
+      showStatus("globalStatus", "Não foi possível carregar a biblioteca Supabase.", "error");
+      return;
+    }
+
+    try {
+      supabase = window.supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_PUBLISHABLE_KEY
+      );
+
+      const { data, error } = await supabase.auth.getSession();
+      if (error) throw error;
+      currentUser = data.session?.user || null;
+
+      supabase.auth.onAuthStateChange((_event, session) => {
+        currentUser = session?.user || null;
+        updateAccount();
+      });
+
+      updateAccount();
+      await loadCatalog();
+    } catch (error) {
+      showStatus("globalStatus", friendlyError(error), "error");
+    }
+  }
+
+  init();
+})();
 </script>
 </body>
 </html>
